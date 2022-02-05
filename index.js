@@ -31,7 +31,7 @@ const database = client.db('jim-education');
 const teachersCollention = database.collection('teacherData');
 const servicesCollection = database.collection('JIMservices')
 const admitCollection = database.collection('Admition')
-const studentColllection = database.collection('student')
+const studentColllection = database.collection('students')
 const resultPublishCollection = database.collection('result-publish');
 
 
@@ -43,6 +43,21 @@ app.get("/teachers", async(req,res)=>{
     // console.log(teacher)
     res.send(teacher)
 });
+
+// ADD TEACHER
+
+app.post('/addTeacher', async(req, res)=>{
+    const service = req.body;
+    console.log(service)
+//    console.log('hit the post api', service);
+  
+  
+  const result = await teachersCollention.insertOne(service)
+  console.log(result);
+  res.json(result)
+  })
+
+
 // GET STUDENT
 
 
@@ -52,7 +67,15 @@ app.get('/students',async(req,res)=>{
     // console.log(service)
     res.json(student)
 })
+// ADD STUDENT
+app.post('/addStudent', async(req, res)=>{
+    const service = req.body;
+    console.log(service)
 
+  const result = await studentColllection.insertOne(service)
+  console.log(result);
+  res.json(result)
+  })
 
 // GET API
 app.get('/services',async(req,res)=>{
@@ -61,6 +84,18 @@ app.get('/services',async(req,res)=>{
     // console.log(service)
     res.json(service)
 })
+
+
+// POST SERVICES
+app.post('/addServices', async(req, res)=>{
+    const service = req.body;
+    console.log(service)
+
+  const result = await servicesCollection.insertOne(service)
+  console.log(result);
+  res.json(result)
+  })
+
      // get single service
      app.get("/services/:ID", async (req, res) => {
         const id = req.params.ID;
@@ -80,7 +115,8 @@ app.get('/results',async(req,res)=>{
 
 // GET ADMITION
 app.get('/admition',async(req,res)=>{
-    const cursor = admitCollection.find({})
+    const cursor = admitCollection.find({});
+    console.log(cursor)
     const admit = await cursor.toArray()
     console.log(admit)
     res.json(admit)
