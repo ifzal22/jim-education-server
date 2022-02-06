@@ -30,7 +30,7 @@ async function run(){
 const database = client.db('jim-education');
 const teachersCollention = database.collection('teacherData');
 const servicesCollection = database.collection('JIMservices')
-const admitCollection = database.collection('Admition')
+const admitCollection = database.collection('admitionALL')
 const studentColllection = database.collection('students')
 const resultPublishCollection = database.collection('result-publish');
 
@@ -110,7 +110,16 @@ app.get('/results',async(req,res)=>{
     // console.log(result)
     res.json(result)
 })
+// POST RESULT
+app.post('/Addresult', async(req, res)=>{
+    const admition = req.body;
+    console.log(admition)
 
+  const result = await resultPublishCollection.insertOne(admition)
+  console.log(result);
+  res.send(result)
+  })
+    
 
 
 // GET ADMITION
@@ -121,7 +130,26 @@ app.get('/admition',async(req,res)=>{
     console.log(admit)
     res.json(admit)
 })
+
+app.post('/AddAdmition', async(req, res)=>{
+    const admition = req.body;
+    console.log(admition)
+
+  const result = await admitCollection.insertOne(admition)
+  console.log(result);
+  res.send(result)
+  })
     
+
+//   single admition
+app.get("/admition/:booking", async (req, res) => {
+    const id = req.params.booking;
+    const query = { _id: ObjectId(id) };
+    const result = await admitCollection.findOne(query);
+    res.json(result);
+});
+
+
     }
     finally{
         // await client.close();
