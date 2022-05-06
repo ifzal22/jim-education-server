@@ -2,13 +2,59 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
-
+const admin = require("firebase-admin");
 const app = express();
 const port =  process.env.PORT || 5000;
 
+
+// ADMIN
+
+
+const serviceAccount = require('./education-web-admin-sdk.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+
+
+
+
+
 const ObjectId = require('mongodb').ObjectId;
+const fileUpload = require('express-fileupload')
+
+
+const stripe = require('stripe')(process.env.STRIPE_SECRITE)
+
+
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
+
+
+// VERIFY TOKEN
+
+async function verifyToken(req, res, next) {
+    if (req.headers?.authorization?.startsWith('Bearer ')) {
+        const token = req.headers.authorization.split(' ')[1];
+
+        try {
+            const decodedUser = await admin.auth().verifyIdToken(token);
+            req.decodedEmail = decodedUser.email;
+        }
+        catch {
+
+        }
+
+    }
+    next();
+
+
+}
+
+
+
 
 
 
@@ -33,6 +79,9 @@ const servicesCollection = database.collection('JIMservices')
 const admitCollection = database.collection('admitionALL')
 const studentColllection = database.collection('students')
 const resultPublishCollection = database.collection('result-publish');
+const userCollection = database.collection('users')
+
+
 
 
 // GET TEACHER
@@ -43,6 +92,15 @@ app.get("/teachers", async(req,res)=>{
     // console.log(teacher)
     res.send(teacher)
 });
+
+app.get("/teacher/:about", async (req, res) => {
+    const id = req.params.about;
+    const query = { _id: ObjectId(id) };
+    const result = await teachersCollention.findOne(query);
+    res.json(result);
+});
+
+
 
 // ADD TEACHER
 
@@ -103,6 +161,9 @@ app.post('/addServices', async(req, res)=>{
         const result = await servicesCollection.findOne(query);
         res.json(result);
     });
+
+
+
 // GET API
 app.get('/results',async(req,res)=>{
     const cursor = resultPublishCollection.find({})
@@ -110,6 +171,19 @@ app.get('/results',async(req,res)=>{
     // console.log(result)
     res.json(result)
 })
+
+app.get("/result/:ID", async (req, res) => {
+    const id = req.params.ID;
+    const query = { _id: ObjectId(id) };
+    const result = await resultPublishCollection.findOne(query);
+    res.json(result);
+});
+
+
+
+
+
+
 // POST RESULT
 app.post('/Addresult', async(req, res)=>{
     const admition = req.body;
@@ -131,15 +205,42 @@ app.get('/admition',async(req,res)=>{
     res.json(admit)
 })
 
+
 app.post('/AddAdmition', async(req, res)=>{
     const admition = req.body;
-    console.log(admition)
+    // console.log('files',req.files)
+    const pic = req.files.image;
 
-  const result = await admitCollection.insertOne(admition)
+const picData = pic.data;
+
+
+const encidPic = picData.toString('base64')
+const imageBaffer = Buffer.from(encidPic, 'base64');
+
+// console.log(imageBaffer)
+//     console.log('file',req.file);
+
+const AllItem = 
+
+{ admition, 
+
+image:imageBaffer}
+// console.log(AllItem)
+  const result = await admitCollection.insertOne(AllItem)
   console.log(result);
   res.send(result)
   })
     
+// DELETED ADMITION
+app.delete("/deleteAdmition/:id", async (req, res) => {
+    const result = await admitCollection.deleteOne({
+        _id: ObjectId(req.params.id),
+    });
+    console.log(result)
+    res.json(result);
+});
+
+
 
 //   single admition
 app.get("/admition/:booking", async (req, res) => {
@@ -150,6 +251,73 @@ app.get("/admition/:booking", async (req, res) => {
 });
 
 
+// USER DATA
+app.post('/users',async(req,res)=>{
+    const user = req.body;
+    const result = await userCollection.insertOne(user);
+    console.log(result)
+    res.json(result);
+})
+
+app.put('/users',async(req,res)=>{
+    const user = req.body;
+    const filter = {email: user.email};
+    const options = {upsert:true};
+    const updateDoc = {$set:user};
+    const result = await userCollection.updateOne(filter,updateDoc,options);
+    res.json(result)
+})
+
+app.put('/users/admin',verifyToken, async(req,res)=>{
+    const user = req.body;
+    console.log(('put', req.decodedEmail))
+
+
+const requeSter = req.decodedEmail;
+if(requeSter){
+    const reqStartAccount = await userCollection.findOne({email:requeSter});
+    if(reqStartAccount.role === 'admin'){
+
+        const filter = {email: user.email};
+        const updateDoc = {$set:{role:'admin'}};
+        const result = await userCollection.updateOne(filter,updateDoc);
+        res.json(result)
+    }
+}
+else{res.status(403).json({message:'you do not have access to make admin'})}
+
+
+
+    console.log(result)
+
+})
+app.get('/users/:email',async(req,res)=>{
+    const email = req.params.email;
+    const query = {email: email};
+    const user = await userCollection.findOne(query);
+let isAdmin = false;
+    if(user?.role === 'admin'){
+        isAdmin = true;
+    }
+    res.json({admin:isAdmin});
+})
+
+
+
+
+app.post('/create-payment-intent', async(req,res)=>{
+    const paymentInfo = req.body;
+    const amount = paymentInfo.price * 100;
+    const paymentIntent = await stripe.paymentIntents.create({
+        currency: "usd",
+amount: amount,
+automatic_payment_methods:['card']
+  
+
+    });
+
+    res.json({  clientSecret: paymentIntent.client_secret,})
+})
     }
     finally{
         // await client.close();
