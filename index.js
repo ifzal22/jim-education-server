@@ -81,7 +81,7 @@ const studentColllection = database.collection('students')
 const resultPublishCollection = database.collection('result-publish');
 const userCollection = database.collection('users')
 
-
+const orders = database.collection('AllOrder')
 
 
 // GET TEACHER
@@ -250,6 +250,33 @@ app.get("/admition/:booking", async (req, res) => {
     res.json(result);
 });
 
+/* app.put('/admitions/:id', async (req, res) => {
+    const id = req.params.id;
+    const payment = req.body;
+    const filter = { _id: ObjectId(id) };
+    const updateDoc = {
+        $set: {
+            payment: payment
+        }
+    };
+    const result = await appointmentsCollection.updateOne(filter, updateDoc);
+    res.json(result);
+})
+ */
+
+
+
+// order all
+app.post('/orders',async(req,res)=>{
+    const user = req.body;
+    const result = await orders.insertOne(user);
+    console.log(result)
+    res.json(result);
+})
+
+
+
+
 
 // USER DATA
 app.post('/users',async(req,res)=>{
@@ -307,6 +334,7 @@ let isAdmin = false;
 
 app.post('/create-payment-intent', async(req,res)=>{
     const paymentInfo = req.body;
+    console.log(paymentInfo);
     const amount = paymentInfo.price * 100;
     const paymentIntent = await stripe.paymentIntents.create({
         currency: "usd",
