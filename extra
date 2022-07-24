@@ -1,0 +1,37 @@
+// FUNTION
+async function run() {
+  try {
+    await client.connect();
+    console.log("DATABASE CONNECTED SUCCESFULL");
+    const database = client.db("jim-education");
+
+    /* app.put('/admitions/:id', async (req, res) => {
+    const id = req.params.id;
+    const payment = req.body;
+    const filter = { _id: ObjectId(id) };
+    const updateDoc = {
+        $set: {
+            payment: payment
+        }
+    };
+    const result = await appointmentsCollection.updateOne(filter, updateDoc);
+    res.json(result);
+})
+ */
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const paymentInfo = req.body;
+      console.log(paymentInfo);
+      const amount = paymentInfo.price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        currency: "usd",
+        amount: amount,
+        automatic_payment_methods: ["card"],
+      });
+
+      res.json({ clientSecret: paymentIntent.client_secret });
+    });
+  } finally {
+    // await client.close();
+  }
+}
