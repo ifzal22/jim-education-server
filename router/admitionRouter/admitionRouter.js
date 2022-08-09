@@ -19,7 +19,7 @@ const Admition = async () => {
       const cursor = admitCollection.find({});
       console.log(cursor);
       const admit = await cursor.toArray();
-      console.log(admit);
+      // console.log(admit);
       res.json(admit);
     });
 
@@ -43,7 +43,7 @@ const Admition = async () => {
       };
       // console.log(AllItem)
       const result = await admitCollection.insertOne(AllItem);
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
 
@@ -52,7 +52,7 @@ const Admition = async () => {
       const result = await admitCollection.deleteOne({
         _id: ObjectId(req.params.id),
       });
-      console.log(result);
+      // console.log(result);
       res.json(result);
     });
 

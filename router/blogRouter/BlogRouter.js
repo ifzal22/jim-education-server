@@ -11,11 +11,10 @@ const Blog = async () => {
   try {
     await client.connect();
     const database = client.db("jim-education");
-    const blog = database.collection("JIMservices");
+    const blog = database.collection("blogsAll");
     // POST blog
     router.post("/blogs", async (req, res) => {
       const service = req.body;
-      console.log(service);
 
       const result = await blog.insertOne(service);
       console.log(result);

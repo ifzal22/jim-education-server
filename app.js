@@ -2,10 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const admin = require("firebase-admin");
+
 const app = express();
 const port = process.env.PORT || 5000;
-const dotenv = require("dotenv");
+
 const Teacher = require("./router/teacherRouter/teacherRouter");
 const student = require("./router/StudentRouter/StudentRouter");
 const service = require("./router/serviceRouter/ServiceRouter");
@@ -15,11 +15,7 @@ const Result = require("./router/result/ResultRouter/ResultRouter");
 const Order = require("./router/admitionRouter//orderRouter");
 const Blog = require("./router/blogRouter/BlogRouter");
 const Notice = require("./router/NoticeRouter/noticeRouter");
-const serviceAccount = require("./education-web-admin-sdk.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 // database connection
 mongoose
   .connect(

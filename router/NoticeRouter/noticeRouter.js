@@ -12,7 +12,8 @@ const Notice = async () => {
   try {
     await client.connect();
     const database = client.db("jim-education");
-    const notice = database.collection("JIMservices");
+    const notice = database.collection("notice");
+
     router.post("/notices", async (req, res) => {
       const service = req.body;
       console.log(service);
@@ -39,7 +40,7 @@ const Notice = async () => {
       const result = await notice.deleteOne({
         _id: ObjectId(req.params.id),
       });
-      console.log(result);
+      // console.log(result);
       res.json(result);
     });
   } finally {
