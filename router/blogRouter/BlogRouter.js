@@ -12,6 +12,7 @@ const Blog = async () => {
     await client.connect();
     const database = client.db("jim-education");
     const blog = database.collection("blogsAll");
+    const blogComment = database.collection("blogComment");
     // POST blog
     router.post("/blogs", async (req, res) => {
       const service = req.body;
@@ -20,20 +21,50 @@ const Blog = async () => {
       console.log(result);
       res.json(result);
     });
+
+    // POST comment
+    router.post("/comment", async (req, res) => {
+      const service = req.body;
+
+      const result = await blogComment.insertOne(service);
+      console.log(result);
+      res.json(result);
+    });
+    // comment get
+    router.get("/comment", async (req, res) => {
+      const cursor = blogComment.find({});
+      const service = await cursor.toArray();
+      // console.log(service)
+      res.json(service);
+    });
+
+    // DELETED
+    router.delete("/comment/:id", async (req, res) => {
+      const result = await blogComment.deleteOne({
+        _id: ObjectId(req.params.id),
+      });
+      console.log(result);
+      res.json(result);
+    });
+
+    // Blog get
     router.get("/blogs", async (req, res) => {
       const cursor = blog.find({});
       const service = await cursor.toArray();
       // console.log(service)
       res.json(service);
-      router.get("/blogs/:ID", async (req, res) => {
-        const id = req.params.ID;
-        const query = { _id: ObjectId(id) };
-        const result = await blog.findOne(query);
-        res.json(result);
-      });
     });
+
+    //   single admition
+    router.get("/blogs/:booking", async (req, res) => {
+      const id = req.params.booking;
+      const query = { _id: ObjectId(id) };
+      const result = await blog.findOne(query);
+      res.json(result);
+    });
+
     // DELETED
-    router.delete("/blog/:id", async (req, res) => {
+    router.delete("/blogs/:id", async (req, res) => {
       const result = await blog.deleteOne({
         _id: ObjectId(req.params.id),
       });
@@ -41,12 +72,6 @@ const Blog = async () => {
       res.json(result);
     });
     //   single
-    router.get("/blog/:id", async (req, res) => {
-      const id = req.params.booking;
-      const query = { _id: ObjectId(id) };
-      const result = await blog.findOne(query);
-      res.json(result);
-    });
   } finally {
   }
 };
