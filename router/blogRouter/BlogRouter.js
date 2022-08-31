@@ -47,7 +47,7 @@ const Blog = async () => {
       res.json(result);
     });
 
-    // Blog get
+    // Blogs get
     router.get("/blogs", async (req, res) => {
       const cursor = blog.find({});
       const service = await cursor.toArray();
