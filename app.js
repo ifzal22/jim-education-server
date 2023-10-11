@@ -12,7 +12,7 @@ const service = require("./router/serviceRouter/ServiceRouter");
 const User = require("./router/userRoute/userRouter");
 const Admition = require("./router/admitionRouter/admitionRouter");
 const Result = require("./router/result/ResultRouter/ResultRouter");
-const Order = require("./router/admitionRouter//orderRouter");
+// const Order = require("./router/admitionRouter//orderRouter");
 const Blog = require("./router/blogRouter/BlogRouter");
 const Notice = require("./router/NoticeRouter/noticeRouter");
 
@@ -41,7 +41,7 @@ app.use("/service", service);
 app.use("/User", User);
 app.use("/Admition", Admition);
 app.use("/result", Result);
-app.use("/Order", Order);
+// app.use("/Order", Order);
 app.use("/blog", Blog);
 app.use("/Notice", Notice);
 
