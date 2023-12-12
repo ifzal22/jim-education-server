@@ -8,6 +8,7 @@ const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 async function Teacher() {
   try {
     await client.connect();
